@@ -14,5 +14,8 @@ public:
 	const std::vector<Square>& cget_board() const;
 	void build_board();
 	void display_board() const;
-	Square& get_pos();
+	const Square& cget_pos() const;
+	const Square& find_square(uint, uint) const;
+	bool is_accessible(Square) const;
+	bool is_in_range(int, int) const;
 };

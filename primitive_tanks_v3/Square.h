@@ -23,4 +23,7 @@ public:
 	uint& get_x_pos();
 	const uint& cget_y_pos() const;
 	uint& get_y_pos();
+	bool is_locked() const;
+	bool is_hit() const;
+	void lock_square();
 };
