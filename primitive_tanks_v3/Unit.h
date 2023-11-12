@@ -14,5 +14,6 @@ public:
 	Unit() : unit_id(0), Square (x_pos, y_pos), ammo(18), state(invalid) {}
 	Unit& get_unit();
 	const Unit& cget_unit() const;
+	const uint& cget_unit_id() const;
 	void set_unit_id(uint);
 };

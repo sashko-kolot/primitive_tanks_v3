@@ -8,6 +8,10 @@ const Unit& Unit::cget_unit() const
 {
 	return *this;
 }
+const uint& Unit::cget_unit_id() const
+{
+	return unit_id;
+}
 //setters
 void Unit::set_unit_id(uint id)
 {

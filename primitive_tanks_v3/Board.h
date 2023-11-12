@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <iomanip>
+#include <cstdlib>
 #include "Square.h"
 class Board
 {
@@ -14,8 +15,11 @@ public:
 	const std::vector<Square>& cget_board() const;
 	void build_board();
 	void display_board() const;
-	const Square& cget_pos() const;
-	const Square& find_square(uint, uint) const;
-	bool is_accessible(Square) const;
+	Square& get_pos();
+	Square& find_square(uint, uint);
+	bool is_accessible(Square&);
 	bool is_in_range(int, int) const;
+	void locker(Square&);
+	void unlocker(Square&);
+	void proceed();
 };
