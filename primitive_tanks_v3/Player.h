@@ -1,6 +1,7 @@
 #pragma once
 #include "Board.h"
 #include "Unit.h"
+#include <random>
 class Player
 {
 private:
@@ -19,14 +20,22 @@ public:
 	std::vector<Unit>& get_my_units();
 	const std::vector<Unit>& cget_my_units() const;
 	void build_units();
-	//void place_units();
-	//void place_units(Player&, Player&);
 	void place_mines_and_units(Player&, Player&);
 	Player& get_player();
+	Unit& find_unit_by_id();
 	bool is_my_turn();
 	void set_my_turn();
 	void set_not_my_turn();
-	//void mine_board();
 	void proceed();
-	//const Unit& find_unit(Square) const;
+	void place_loot(Player&);
+	void action(Player&, Player&);
+	void move_update(Player*, Player*, Unit*, uint, uint);
+	void loot(Square&, Unit*);
+	bool move(Player*, Player*, Unit*);
+	bool is_passable(Player*, uint, uint);
+	bool mine_on_path(Player*, Player*, uint, uint, Unit*);
+	bool move_fwd(Player*, Player*, Unit*, int);
+	bool move_bwd(Player*, Player*, Unit*, int);
+	bool move_lft(Player*, Player*, Unit*, int);
+	bool move_rgt(Player*, Player*, Unit*, int);
 };

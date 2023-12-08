@@ -12,6 +12,14 @@ const uint& Unit::cget_unit_id() const
 {
 	return unit_id;
 }
+const uint& Unit::cget_ammo() const
+{
+	return ammo;
+}
+uint& Unit::get_ammo()
+{
+	return ammo;
+}
 //setters
 void Unit::set_unit_id(uint id)
 {

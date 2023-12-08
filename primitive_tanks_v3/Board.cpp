@@ -58,7 +58,7 @@ bool Board::is_accessible(Square& square)
 {
 	uint x = 0, y = 0;
 	bool left = false, right = false, top = false, bottom = false;
-	if (square.is_locked() || square.is_hit())
+	if (square.is_locked() || square.is_hit() || square.is_kill())
 	{
 		std::cout << "The square is inaccessible." << std::endl;
 		proceed();
@@ -329,6 +329,10 @@ void Board::display_board() const
 		if (cget_board()[i].cget_square().is_unit() && !cget_board()[i].cget_square().is_hidden())
 		{
 			std::cout << "U" << cget_board()[i].cget_square().cget_cur_unit_id() << "\t";
+		}
+		else if (cget_board()[i].cget_square().is_locked())
+		{
+			std::cout << "lock" << "\t";
 		}
 		else if (cget_board()[i].cget_square().is_kill())
 		{
