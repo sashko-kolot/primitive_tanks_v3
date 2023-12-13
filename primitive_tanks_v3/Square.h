@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SQUARE_H
+#define SQUARE_H
 #include <bitset>
 #include "my_typedefs.h"
 class Square
@@ -47,6 +48,7 @@ public:
 	void lock_square();
 	void unlock_square();
 	void unhide_square();
+	void hide_square();
 	void set_mine();
 	void remove_mine();
 	void set_unit();
@@ -65,5 +67,7 @@ public:
 	void remove_extra_ammo();
 	void set_kill();
 	void assign_unit_id(uint);
+	void set_hit();
 	uint cget_cur_unit_id() const;
 };
+#endif SQUARE_H

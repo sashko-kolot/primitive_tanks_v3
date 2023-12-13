@@ -310,18 +310,6 @@ bool Board::is_in_range(int x, int y) const
 	else
 		return true;
 }
-//display board for debug
-//void Board::display_board() const
-//{
-//	for (uint i = 0; i < board_size; ++i)
-//	{
-//		std::cout <<  cget_board()[i].cget_square().cget_x_pos() << ":" << cget_board()[i].cget_square().cget_y_pos() << "\t";
-//		if ((i + 1) % x_size == 0)
-//		{
-//			std::cout << std::endl;
-//		}
-//	}
-//}
 void Board::display_board() const
 {
 	for (uint i = 0; i < board_size; ++i)

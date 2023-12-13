@@ -1,4 +1,5 @@
-#pragma once
+#ifndef BOARD_H
+#define BOARD_H
 #include <vector>
 #include <iostream>
 #include <iomanip>
@@ -23,3 +24,4 @@ public:
 	void unlocker(Square&);
 	void proceed();
 };
+#endif BOARD_H

@@ -90,6 +90,11 @@ uint Square::cget_cur_unit_id() const
  {
 	 state.reset(hidden);
  }
+ //hide square
+ void Square::hide_square()
+ {
+	 state.set(hidden);
+ }
 //set mine
  void Square::set_mine()
  {
@@ -223,4 +228,8 @@ uint Square::cget_cur_unit_id() const
  void Square::assign_unit_id(uint id)
  {
 	 cur_unit = id;
+ }
+ void Square::set_hit()
+ {
+	 state.set(kill);
  }
