@@ -1,5 +1,5 @@
 #include "Board.h"
-uint Board::x_size = 15, Board::y_size = 12, Board::board_size = x_size * y_size;
+int Board::x_size = 15, Board::y_size = 12, Board::board_size = x_size * y_size;
 //get board
 std::vector<Square>& Board::get_board()
 {
@@ -24,24 +24,26 @@ const std::vector<Square>& Board::cget_board() const
 	return find_square(x, y);
 }
 //find square
-Square& Board::find_square(uint x, uint y) 
+Square& Board::find_square(int x, int y) 
 {
-	for (uint i = 0; i < board_size; ++i)
+	Square* square = nullptr;
+	for (int i = 0; i < board_size; ++i)
 	{
 		if (cget_board()[i].cget_square().cget_x_pos() == x && cget_board()[i].cget_square().cget_y_pos() == y)
-			return get_board()[i].get_square();
+			square = &get_board()[i].get_square();
 	}
+	return square->get_square();
 }
 //build board
 void Board::build_board()
 {
-	for (uint i = 0; i < board_size; ++i)
+	for (int i = 0; i < board_size; ++i)
 	{
 		Square square;
 		get_board().push_back(square);
 	}
-	uint y = y_size, x = 1;
-	for (uint i = 0; i < board_size; ++i)
+	int y = y_size, x = 1;
+	for (int i = 0; i < board_size; ++i)
 	{
 			get_board()[i].get_square().get_x_pos() = x;
 			get_board()[i].get_square().get_y_pos() = y;
@@ -56,7 +58,7 @@ void Board::build_board()
 //check square accessibility
 bool Board::is_accessible(Square& square)
 {
-	uint x = 0, y = 0;
+	int x = 0, y = 0;
 	bool left = false, right = false, top = false, bottom = false;
 	if (square.is_locked() || square.is_hit() || square.is_kill())
 	{
@@ -169,7 +171,7 @@ bool Board::is_accessible(Square& square)
 //lock squares
 void Board::locker(Square& square)
 {
-	uint x = 0, y = 0;
+	int x = 0, y = 0;
 	bool left = false, right = false, top = false, bottom = false;
 	//lock unit square
 	square.lock_square();
@@ -237,7 +239,7 @@ void Board::locker(Square& square)
 //unlock squares
 void Board::unlocker(Square& square)
 {
-	uint x = 0, y = 0;
+	int x = 0, y = 0;
 	bool left = false, right = false, top = false, bottom = false;
 	//unlock unit square
 	square.unlock_square();
@@ -312,7 +314,7 @@ bool Board::is_in_range(int x, int y) const
 }
 void Board::display_board() const
 {
-	for (uint i = 0; i < board_size; ++i)
+	for (int i = 0; i < board_size; ++i)
 	{
 		if (cget_board()[i].cget_square().is_unit() && !cget_board()[i].cget_square().is_hidden())
 		{

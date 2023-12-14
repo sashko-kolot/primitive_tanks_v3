@@ -8,7 +8,7 @@
 class Board
 {
 private:
-	static uint x_size, y_size, board_size;
+	static int x_size, y_size, board_size;
 	std::vector <Square> board;
 public:
 	Board() : board() {}
@@ -17,7 +17,7 @@ public:
 	void build_board();
 	void display_board() const;
 	Square& get_pos();
-	Square& find_square(uint, uint);
+	Square& find_square(int, int);
 	bool is_accessible(Square&);
 	bool is_in_range(int, int) const;
 	void locker(Square&);

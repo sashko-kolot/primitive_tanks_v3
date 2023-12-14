@@ -9,25 +9,25 @@ const Square& Square::cget_square() const
 	return *this;
 }
 //get x coordinate
-uint& Square::get_x_pos()
+int& Square::get_x_pos()
 {
 	return x_pos;
 }
-const uint& Square::cget_x_pos() const
+const int& Square::cget_x_pos() const
 {
 	return x_pos;
 }
 //get y coordinate
-uint& Square::get_y_pos()
+int& Square::get_y_pos()
 {
 	return y_pos;
 }
-const uint& Square::cget_y_pos() const
+const int& Square::cget_y_pos() const
 {
 	return y_pos;
 }
 //get current unit id
-uint Square::cget_cur_unit_id() const
+int Square::cget_cur_unit_id() const
 {
 	return cur_unit;
 }
@@ -225,7 +225,7 @@ uint Square::cget_cur_unit_id() const
 		 return false;
  }
  //assign current unit id to square
- void Square::assign_unit_id(uint id)
+ void Square::assign_unit_id(int id)
  {
 	 cur_unit = id;
  }

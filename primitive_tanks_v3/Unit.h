@@ -5,8 +5,8 @@
 class Unit : public Square
 {
 private:
-	uint unit_id;
-	uint ammo;
+	int unit_id;
+	int ammo;
 	enum State
 	{
 	invalid,
@@ -23,10 +23,10 @@ public:
 	Unit() : unit_id(0), Square(x_pos, y_pos), ammo(18), reconned_squares() {state.set(invalid);}
 	Unit& get_unit();
 	const Unit& cget_unit() const;
-	const uint& cget_unit_id() const;
-	const uint& cget_ammo() const;
-	uint& get_ammo();
-	void set_unit_id(uint);
+	const int& cget_unit_id() const;
+	const int& cget_ammo() const;
+	int& get_ammo();
+	void set_unit_id(int);
 	std::vector<Square>& get_reconned_squares();
 };
 #endif UNIT_H

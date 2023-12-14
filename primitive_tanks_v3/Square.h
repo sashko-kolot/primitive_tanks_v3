@@ -1,7 +1,6 @@
 #ifndef SQUARE_H
 #define SQUARE_H
 #include <bitset>
-#include "my_typedefs.h"
 class Square
 {
 private:
@@ -22,16 +21,16 @@ private:
 	};
 	std::bitset<12> state;
 protected:
-	uint x_pos, y_pos, cur_unit;
+	int x_pos, y_pos, cur_unit;
 public:
 	Square() : x_pos(0), y_pos(0), cur_unit(0) {state.set(hidden);}
-	Square(uint x_pos, uint y_pos) : x_pos(0), y_pos(0), cur_unit(0) {state.set(hidden);}
+	Square(int x_pos, int y_pos) : x_pos(0), y_pos(0), cur_unit(0) {state.set(hidden);}
 	Square& get_square();
 	const Square& cget_square() const;
-	const uint& cget_x_pos() const;
-	uint& get_x_pos();
-	const uint& cget_y_pos() const;
-	uint& get_y_pos();
+	const int& cget_x_pos() const;
+	int& get_x_pos();
+	const int& cget_y_pos() const;
+	int& get_y_pos();
 	bool is_locked() const;
 	bool is_hit() const;
 	bool is_unit() const;
@@ -66,8 +65,8 @@ public:
 	void set_extra_ammo();
 	void remove_extra_ammo();
 	void set_kill();
-	void assign_unit_id(uint);
+	void assign_unit_id(int);
 	void set_hit();
-	uint cget_cur_unit_id() const;
+	int cget_cur_unit_id() const;
 };
 #endif SQUARE_H
