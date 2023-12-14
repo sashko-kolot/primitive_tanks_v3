@@ -361,3 +361,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/primitive_tanks_v3/game_over.h
+/primitive_tanks_v3/action.cpp
+/primitive_tanks_v3/action.h
+/primitive_tanks_v3/game_over.cpp
