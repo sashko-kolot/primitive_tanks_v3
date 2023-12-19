@@ -231,5 +231,5 @@ int Square::cget_cur_unit_id() const
  }
  void Square::set_hit()
  {
-	 state.set(kill);
+	 state.set(hit);
  }

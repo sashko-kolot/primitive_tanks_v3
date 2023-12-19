@@ -12,8 +12,8 @@ int main()
 	system("cls");
 	player1.get_player().set_my_turn();
 	place_mines_and_units(player1.get_player(), player2.get_player());
-	place_loot(player1.get_player_board());
 	place_mines_and_units(player1.get_player(), player2.get_player());
+	place_loot(player1.get_player_board());
 	place_loot(player2.get_player_board());
 	do
 	{

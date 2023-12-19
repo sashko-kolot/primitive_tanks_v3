@@ -65,10 +65,10 @@ void Player::set_not_my_turn()
 }
 void Player::count_total_ammo()
 	{
-		for (int i = 0; i < my_units.size(); ++i)
+	total_ammo = 0;
+	for (int i = 0; i < my_units.size(); ++i)
 		{
-			total_ammo = 0;
-			total_ammo += my_units[i].cget_ammo();
+			total_ammo += my_units[i].get_ammo();
 		}
 	}
 	void Player::set_player_name()
@@ -79,6 +79,7 @@ void Player::count_total_ammo()
 		std::cout << "Enter player name: ";
 		std::cin >> player_name;
 		std::cout << "Press 'y' to confirm or any other key to enter a different name." << std::endl;
+		std::cin >> choice;
 		} while (choice != 'y');
 	}
 	const std::string& Player::cget_player_name() const
@@ -116,8 +117,8 @@ void Player::count_total_ammo()
 		for (pos = 0; pos < my_units.size(); ++pos)
 		{
 			if (my_units[pos].cget_unit_id() == unit->cget_unit_id())
-				it = my_units.begin() + pos;
 				break;
 		}
+		it = my_units.begin() + pos;
 		my_units.erase(it);
 	}

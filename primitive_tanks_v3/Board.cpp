@@ -316,9 +316,25 @@ void Board::display_board() const
 {
 	for (int i = 0; i < board_size; ++i)
 	{
-		if (cget_board()[i].cget_square().is_unit() && !cget_board()[i].cget_square().is_hidden())
+		if (cget_board()[i].cget_square().is_unit() && !cget_board()[i].cget_square().is_hidden() && !cget_board()[i].cget_square().is_mine())
 		{
 			std::cout << "U" << cget_board()[i].cget_square().cget_cur_unit_id() << "\t";
+		}
+		else if (cget_board()[i].cget_square().is_unit() && cget_board()[i].cget_square().is_mine() && !cget_board()[i].cget_square().is_hidden())
+		{
+			std::cout << "mine" << "\t";
+		}
+		else if (cget_board()[i].cget_square().is_unit() && cget_board()[i].cget_square().is_mine() && cget_board()[i].cget_square().is_hidden())
+		{
+			std::cout << "U" << cget_board()[i].cget_square().cget_cur_unit_id() << "\t";
+		}
+		else if (cget_board()[i].cget_square().is_locked() && cget_board()[i].cget_square().is_kill())
+		{
+			std::cout << "kill" << "\t";
+		}
+		else if (cget_board()[i].cget_square().is_locked() && cget_board()[i].cget_square().is_hit())
+		{
+			std::cout << "hit" << "\t";
 		}
 		else if (cget_board()[i].cget_square().is_locked())
 		{

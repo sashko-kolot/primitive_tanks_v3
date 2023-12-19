@@ -1,6 +1,7 @@
 #ifndef UNIT_H
 #define UNIT_H
 #include <vector>
+#include <memory>
 #include "Square.h"
 class Unit : public Square
 {
@@ -18,7 +19,7 @@ private:
 	extra_ammo
 	};
 std::bitset<7> state;
-std::vector<Square> reconned_squares;
+std::vector<std::shared_ptr<Square>>reconned_squares;
 public:
 	Unit() : unit_id(0), Square(x_pos, y_pos), ammo(18), reconned_squares() {state.set(invalid);}
 	Unit& get_unit();
@@ -27,6 +28,7 @@ public:
 	const int& cget_ammo() const;
 	int& get_ammo();
 	void set_unit_id(int);
-	std::vector<Square>& get_reconned_squares();
+	std::vector <std::shared_ptr<Square>>& get_reconned_squares();
+	~Unit() {reconned_squares.clear();}
 };
 #endif UNIT_H
