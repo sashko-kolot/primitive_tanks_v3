@@ -68,6 +68,13 @@ int Square::cget_cur_unit_id() const
 	 else
 		 return false;
  }
+ bool Square::is_no_recon() const
+ {
+	 if (state.test(no_recon))
+		 return true;
+	 else
+		 return false;
+ }
  bool Square::is_kill() const
  {
 	 if (state.test(kill))
@@ -94,6 +101,14 @@ int Square::cget_cur_unit_id() const
  void Square::hide_square()
  {
 	 state.set(hidden);
+ }
+ void Square::set_no_recon()
+ {
+	 state.set(no_recon);
+ }
+ void Square::remove_no_recon()
+ {
+	 state.reset(no_recon);
  }
 //set mine
  void Square::set_mine()

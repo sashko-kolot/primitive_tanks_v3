@@ -19,7 +19,7 @@ void loot(Square&, Unit*);
 void move_update(Player*, Player*, Unit*, Square&, int, int);
 bool shoot(Player*, Player*, Unit*);
 bool call_air_support(Player*, Player*, Unit*);
-bool reconnoiter(Player*, Unit*);
+void reconnoiter(Player*, Unit*);
 void remove_killed_unit(Player*, Player*, int, int);
 void report(Player*, Player*);
 bool game_over(const Player&, const Player&);

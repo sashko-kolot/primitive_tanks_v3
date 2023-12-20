@@ -132,14 +132,13 @@ void action(Player& player1, Player& player2)
 		if (me->get_player_board().find_square(cur_unit->cget_x_pos(), cur_unit->cget_y_pos()).is_mine())
 		{
 			remove_killed_unit(opponent, me, cur_unit->cget_x_pos(),cur_unit->cget_y_pos());
-			me->count_total_ammo();
 			opponent->get_enemy_board().find_square(cur_unit->cget_x_pos(), cur_unit->cget_y_pos()).remove_mine();
 			std::cout << "Your unit was destroyed by a mine, commander." << std::endl;
 			proceed();
 			break;
 		}
 		char action = ' ';
-		std::cout << "Press 'm' to move, 's' to shoot, 'r' to reconnoiter, or 'a' to call air support: ";
+		std::cout << "Press 'm' to move, 's' to shoot, or 'a' to call air support: ";
 		std::cin >> action;
 		switch (action)
 		{
@@ -155,12 +154,6 @@ void action(Player& player1, Player& player2)
 				action_completed = true;
 			}
 			break;
-		case 'r':
-			if (reconnoiter(me, cur_unit))
-			{
-				action_completed = true;
-			}
-			break;
 		case 'a':
 			if(call_air_support(me, opponent, cur_unit))
 			{
@@ -172,6 +165,8 @@ void action(Player& player1, Player& player2)
 		}
 	} while (!action_completed);
 	system("cls");
+	me->count_total_ammo();
+	opponent->count_total_ammo();
 	std::cout << "Player board" << std::endl;
 	me->cget_player_board().display_board();
 	std::cout << "\nEnemy board" << std::endl;
@@ -684,20 +679,19 @@ bool mine_on_path(Player* player1, Player* player2, int x, int y, Unit* unit)
 	if (player1->get_player_board().find_square(x, y).is_mine() && !unit->is_mine_clearing() && !unit->is_repair_kit())
 	{
 		player1->get_player_board().find_square(x, y).set_kill();
-		if (unit->is_recon_kit() && unit->get_reconned_squares().size() > 0)
+		player1->get_player_board().find_square(unit->cget_x_pos(), unit->cget_y_pos()).remove_unit();
+		if (unit->is_recon_kit())
 		{
-			/*for (int i = 0; i < unit->get_reconned_squares().size(); ++i)
-			{
-				unit->get_reconned_squares()[i].hide_square();
-			}*/
 			for (auto& ptr : unit->get_reconned_squares())
 			{
-				ptr->unhide_square();
+				ptr->hide_square();
 			}
 		}
-		player1->get_player_board().find_square(unit->cget_x_pos(), unit->cget_y_pos()).remove_unit();
+		if (unit->is_mask_kit())
+		{
+			player2->get_enemy_board().find_square(unit->cget_x_pos(), unit->cget_y_pos()).remove_no_recon();
+		}
 		player1->erase_unit(unit);
-		player1->count_total_ammo();
 		player1->get_player_board().find_square(x, y).set_kill();
 		player1->get_player_board().find_square(x, y).remove_mine();
 		player2->get_enemy_board().find_square(x, y).set_kill();
@@ -773,6 +767,18 @@ void loot(Square& square, Unit* unit)
 }
 void move_update(Player* player1, Player* player2, Unit* unit, Square& prev_square, int x, int y)
 {
+	if (unit->is_recon_kit())
+	{
+		for (auto& ptr : unit->get_reconned_squares())
+		{
+			ptr->hide_square();
+		}
+		unit->get_reconned_squares().clear();
+	}
+	if (unit->is_mask_kit())
+	{
+		player2->get_enemy_board().find_square(prev_square.cget_x_pos(), prev_square.cget_y_pos()).remove_no_recon();
+	}
 	prev_square.remove_unit();
 	prev_square.hide_square();
 	player1->get_player_board().unlocker(prev_square);
@@ -782,12 +788,16 @@ void move_update(Player* player1, Player* player2, Unit* unit, Square& prev_squa
 	player1->get_player_board().find_square(x, y).set_unit();
 	player1->get_player_board().find_square(x, y).unhide_square();
 	player1->get_player_board().find_square(x, y).assign_unit_id(unit->cget_unit_id());
+	player2->get_enemy_board().find_square(x, y).assign_unit_id(unit->cget_unit_id());
 	player1->get_player_board().locker(unit->get_square());
 	player2->get_enemy_board().find_square(x, y).set_unit();
-	if (!player2->get_enemy_board().find_square(x, y).is_hidden() && unit->is_mask_kit())
+	if (unit->is_recon_kit())
 	{
-		player2->get_enemy_board().find_square(x, y).hide_square();
-		unit->remove_mask_kit();
+		reconnoiter(player1, unit);
+	}
+	if (unit->is_mask_kit())
+	{
+		player2->get_enemy_board().find_square(unit->cget_x_pos(), unit->cget_y_pos()).set_no_recon();
 	}
 	std::cout << "Your unit reached the destination, commander." << std::endl;
 	proceed();
@@ -832,8 +842,6 @@ bool shoot(Player* player1, Player* player2, Unit* unit)
 			x = target_square->cget_x_pos();
 			y = target_square->cget_y_pos();
 			remove_killed_unit(player1, player2, x, y);
-			player1->count_total_ammo();
-			player2->count_total_ammo();
 			return true;
 		}
 		else
@@ -843,7 +851,6 @@ bool shoot(Player* player1, Player* player2, Unit* unit)
 			--unit->get_ammo();
 			target_square->set_hit();
 			player2->get_player_board().find_square(target_square->cget_x_pos(), target_square->cget_y_pos()).set_hit();
-			player1->count_total_ammo();
 			return true;
 		}
 	}
@@ -875,7 +882,6 @@ bool call_air_support(Player* player1, Player* player2, Unit* unit)
 	if (target_square->is_unit())
 	{
 		remove_killed_unit(player1, player2, x, y);
-		player2->count_total_ammo();
 	}
 	else
 	{
@@ -887,7 +893,6 @@ bool call_air_support(Player* player1, Player* player2, Unit* unit)
 	if (player1->get_enemy_board().find_square(x, y).is_unit())
 	{
 		remove_killed_unit(player1, player2, x, y);
-		player2->count_total_ammo();
 	}
 	else
 	{
@@ -899,7 +904,6 @@ bool call_air_support(Player* player1, Player* player2, Unit* unit)
 	if (player1->get_enemy_board().find_square(x, y).is_unit())
 	{
 		remove_killed_unit(player1, player2, x, y);
-		player2->count_total_ammo();
 	}
 	else
 	{
@@ -912,7 +916,6 @@ bool call_air_support(Player* player1, Player* player2, Unit* unit)
 	if (player1->get_enemy_board().find_square(x, y).is_unit())
 	{
 		remove_killed_unit(player1, player2, x, y);
-		player2->count_total_ammo();
 	}
 	else
 	{
@@ -924,7 +927,6 @@ bool call_air_support(Player* player1, Player* player2, Unit* unit)
 	if (player1->get_enemy_board().find_square(x, y).is_unit())
 	{
 		remove_killed_unit(player1, player2, x, y);
-		player2->count_total_ammo();
 	}
 	else
 	{
@@ -936,7 +938,6 @@ bool call_air_support(Player* player1, Player* player2, Unit* unit)
 	if (player1->get_enemy_board().find_square(x, y).is_unit())
 	{
 		remove_killed_unit(player1, player2, x, y);
-		player2->count_total_ammo();
 	}
 	else
 	{
@@ -948,7 +949,6 @@ bool call_air_support(Player* player1, Player* player2, Unit* unit)
 	if (player1->get_enemy_board().find_square(x, y).is_unit())
 	{
 		remove_killed_unit(player1, player2, x, y);
-		player2->count_total_ammo();
 	}
 	else
 	{
@@ -960,7 +960,6 @@ bool call_air_support(Player* player1, Player* player2, Unit* unit)
 	if (player1->get_enemy_board().find_square(x, y).is_unit())
 	{
 		remove_killed_unit(player1, player2, x, y);
-		player2->count_total_ammo();
 	}
 	else
 	{
@@ -972,7 +971,6 @@ bool call_air_support(Player* player1, Player* player2, Unit* unit)
 	if (player1->get_enemy_board().find_square(x, y).is_unit())
 	{
 		remove_killed_unit(player1, player2, x, y);
-		player2->count_total_ammo();
 	}
 	else
 	{
@@ -984,56 +982,32 @@ bool call_air_support(Player* player1, Player* player2, Unit* unit)
 	proceed();
 	return true;
 }
-bool reconnoiter(Player* player1, Unit* unit)
+void reconnoiter(Player* player1, Unit* unit)
 {
-	Square* target_square = nullptr;
-	if (!unit->is_recon_kit())
-	{
-		std::cout << "Your unit has no reconnaissance kit, commander." << std::endl;
-		proceed();
-		return false;
-	}
-	else
-	{
-		do
-		{
-			target_square = &player1->get_enemy_board().get_pos();
-		} while (!player1->get_enemy_board().is_in_range(target_square->cget_x_pos() - 1, target_square->cget_y_pos())
-			|| !player1->get_enemy_board().is_in_range(target_square->cget_x_pos() + 1, target_square->cget_y_pos())
-			|| !player1->get_enemy_board().is_in_range(target_square->cget_x_pos(), target_square->cget_y_pos() - 1)
-			|| !player1->get_enemy_board().is_in_range(target_square->cget_x_pos(), target_square->cget_y_pos() + 1));
-	}
-	std::cout << "Coordinates received, commander. Ready to recon." << std::endl;
-	proceed();
-	int x, y;
-	x = target_square->cget_x_pos();
-	y = target_square->cget_y_pos();
-	unit->get_reconned_squares().push_back(std::make_shared<Square>(player1->get_enemy_board().find_square(x, y)));
-	x = target_square->cget_x_pos() - 1;
-	unit->get_reconned_squares().push_back(std::make_shared<Square>(player1->get_enemy_board().find_square(x, y)));
-	x = target_square->cget_x_pos() + 1;
-	unit->get_reconned_squares().push_back(std::make_shared<Square>(player1->get_enemy_board().find_square(x, y)));
-	x = target_square->cget_x_pos();
-	y = target_square->cget_y_pos() - 1;
-	unit->get_reconned_squares().push_back(std::make_shared<Square>(player1->get_enemy_board().find_square(x, y)));
-	y = target_square->cget_y_pos() + 1;
-	unit->get_reconned_squares().push_back(std::make_shared<Square>(player1->get_enemy_board().find_square(x, y)));
-	x = target_square->cget_x_pos() - 1;
-	unit->get_reconned_squares().push_back(std::make_shared<Square>(player1->get_enemy_board().find_square(x, y)));
-	y = target_square->cget_y_pos() - 1;
-	unit->get_reconned_squares().push_back(std::make_shared<Square>(player1->get_enemy_board().find_square(x, y)));
-	x = target_square->cget_x_pos() + 1;
-	unit->get_reconned_squares().push_back(std::make_shared<Square>(player1->get_enemy_board().find_square(x, y)));
-	y = target_square->cget_y_pos() + 1;
-	unit->get_reconned_squares().push_back(std::make_shared<Square>(player1->get_enemy_board().find_square(x, y)));
-	//for (int i = 0; i < unit->get_reconned_squares().size(); ++i)
+	unit->get_reconned_squares().push_back(std::make_shared<Square>(player1->get_enemy_board().find_square(unit->cget_x_pos(), unit->cget_y_pos())));
+	if(player1->get_enemy_board().is_in_range(unit->cget_x_pos() - 1, unit->cget_y_pos()))
+	unit->get_reconned_squares().push_back(std::make_shared<Square>(player1->get_enemy_board().find_square(unit->cget_x_pos() - 1, unit->cget_y_pos())));
+	if (player1->get_enemy_board().is_in_range(unit->cget_x_pos() + 1, unit->cget_y_pos()))
+	unit->get_reconned_squares().push_back(std::make_shared<Square>(player1->get_enemy_board().find_square(unit->cget_x_pos() + 1, unit->cget_y_pos())));
+	if (player1->get_enemy_board().is_in_range(unit->cget_x_pos(), unit->cget_y_pos() - 1))
+	unit->get_reconned_squares().push_back(std::make_shared<Square>(player1->get_enemy_board().find_square(unit->cget_x_pos(), unit->cget_y_pos() - 1)));
+	if (player1->get_enemy_board().is_in_range(unit->cget_x_pos(), unit->cget_y_pos() + 1))
+	unit->get_reconned_squares().push_back(std::make_shared<Square>(player1->get_enemy_board().find_square(unit->cget_x_pos(), unit->cget_y_pos() + 1)));
+	if (player1->get_enemy_board().is_in_range(unit->cget_x_pos() - 1, unit->cget_y_pos() + 1))
+	unit->get_reconned_squares().push_back(std::make_shared<Square>(player1->get_enemy_board().find_square(unit->cget_x_pos() - 1, unit->cget_y_pos() + 1)));
+	if (player1->get_enemy_board().is_in_range(unit->cget_x_pos() - 1, unit->cget_y_pos() - 1))
+	unit->get_reconned_squares().push_back(std::make_shared<Square>(player1->get_enemy_board().find_square(unit->cget_x_pos() - 1, unit->cget_y_pos() - 1)));
+	if (player1->get_enemy_board().is_in_range(unit->cget_x_pos() + 1, unit->cget_y_pos() - 1))
+	unit->get_reconned_squares().push_back(std::make_shared<Square>(player1->get_enemy_board().find_square(unit->cget_x_pos() + 1, unit->cget_y_pos() - 1)));
+	if (player1->get_enemy_board().is_in_range(unit->cget_x_pos() + 1, unit->cget_y_pos() + 1))
+	unit->get_reconned_squares().push_back(std::make_shared<Square>(player1->get_enemy_board().find_square(unit->cget_x_pos() + 1, unit->cget_y_pos() + 1)));
 	for(auto& ptr : unit->get_reconned_squares())
 	{
-		ptr->unhide_square();
+		if (!ptr->is_no_recon())
+		{
+			ptr->unhide_square();
+		}
 	}
-	std::cout << "The selected area is being surveilled, commander. Should any enemy unit appear in the area, you will see it on your enemy board." << std::endl;
-	proceed();
-	return true;
 }
 void remove_killed_unit(Player* player1, Player* player2, int x, int y)
 {
@@ -1045,16 +1019,16 @@ void remove_killed_unit(Player* player1, Player* player2, int x, int y)
 		Unit* unit = &player2->get_my_units()[i];
 		if (unit->cget_x_pos() == x && unit->cget_y_pos() == y)
 		{
-			if (unit->is_recon_kit() && unit->get_reconned_squares().size() > 0)
+			if (unit->is_recon_kit())
 			{
-				//for (int i = 0; i < unit->get_reconned_squares().size(); ++i)
-				/*{
-					unit->get_reconned_squares()[i].hide_square();
-				}*/
-				for (auto& ptr : unit->get_reconned_squares())
-				{
-					ptr->unhide_square();
-				}
+					for (auto& ptr : unit->get_reconned_squares())
+					{
+						ptr->hide_square();
+					}
+			}
+			if (unit->is_mask_kit())
+			{
+					player2->get_enemy_board().find_square(unit->cget_x_pos(), unit->cget_y_pos()).remove_no_recon();
 			}
 			player2->erase_unit(unit);
 			break;

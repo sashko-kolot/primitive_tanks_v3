@@ -7,6 +7,7 @@ private:
 	enum State
 	{
 		hidden,
+		no_recon,
 		locked,
 		hit,
 		kill,
@@ -19,7 +20,7 @@ private:
 		mine_clearing,
 		extra_ammo
 	};
-	std::bitset<12> state;
+	std::bitset<13> state;
 protected:
 	int x_pos, y_pos, cur_unit;
 public:
@@ -35,6 +36,7 @@ public:
 	bool is_hit() const;
 	bool is_unit() const;
 	bool is_hidden() const;
+	bool is_no_recon() const;
 	bool is_mine() const;
 	bool is_kill() const;
 	bool is_repair_kit() const;
@@ -48,6 +50,8 @@ public:
 	void unlock_square();
 	void unhide_square();
 	void hide_square();
+	void set_no_recon();
+	void remove_no_recon();
 	void set_mine();
 	void remove_mine();
 	void set_unit();
