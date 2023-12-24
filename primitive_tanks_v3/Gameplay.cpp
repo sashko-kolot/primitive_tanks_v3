@@ -987,11 +987,10 @@ bool call_air_support(Player* player1, Player* player2, Unit* unit)
 }
 void remove_killed_unit(Player* player1, Player* player2, int x, int y)
 {
-	 
-	player1.get_enemy_board().find_square(x, y).remove_unit();
-	player1.get_enemy_board().find_square(x, y).set_kill();
-	player2.get_player_board().unlocker(player2.get_player_board().find_square(x, y));
-	for (int i = 0; i < player2.cget_my_units().size(); ++i)
+	player1->get_enemy_board().find_square(x, y).remove_unit();
+	player1->get_enemy_board().find_square(x, y).set_kill();
+	player2->get_player_board().unlocker(player2->get_player_board().find_square(x, y));
+	for (int i = 0; i < player2->cget_my_units().size(); ++i)
 	{
 		Unit* unit = &player2->get_my_units()[i];
 		if (unit->cget_x_pos() == x && unit->cget_y_pos() == y)

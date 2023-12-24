@@ -1,7 +1,6 @@
 #ifndef UNIT_H
 #define UNIT_H
 #include <vector>
-#include <memory>
 #include "Square.h"
 class Unit : public Square
 {
