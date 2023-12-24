@@ -15,8 +15,20 @@ const std::vector<Square>& Board::cget_board() const
 	int x = 0, y = 0;
 	do
 	{
+		while(true)
+		{ 
 		std::cout << "Enter coordinates (x y): ";
-		std::cin >> x >> y;
+		if (std::cin >> x >> y)
+		{
+			break;
+		}
+		else
+		{
+			std::cout << "Invalid input."<< std::endl;
+			std::cin.clear();
+			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+		}
+		}
 		//check range
 		if (!is_in_range(x, y))
 		std::cout << "Out of range!" << std::endl;
@@ -302,6 +314,145 @@ void Board::unlocker(Square& square)
 		x = square.cget_x_pos() + 1;
 		y = square.cget_y_pos() - 1;
 		find_square(x, y).unlock_square();
+	}
+}
+//reconnaissance logic
+void Board::recon_unhide(Square& square)
+{
+	int x = 0, y = 0;
+	bool left = false, right = false, top = false, bottom = false;
+	//unhide unit square
+	if(!square.is_no_recon())
+	{ 
+	square.unhide_square();
+	}
+	//check and unhide the square on the left
+	if (is_in_range(square.cget_x_pos() - 1, square.cget_y_pos()) && !square.is_no_recon())
+	{
+		x = square.cget_x_pos() - 1;
+		y = square.cget_y_pos();
+		left = true;
+		find_square(x, y).unhide_square();
+	}
+	//check and unhide the square on the right
+	if (is_in_range(square.cget_x_pos() + 1, square.cget_y_pos()) && !square.is_no_recon())
+	{
+		x = square.cget_x_pos() + 1;
+		y = square.cget_y_pos();
+		right = true;
+		find_square(x, y).unhide_square();
+	}
+	//check and unhide the square on the top
+	if (is_in_range(square.cget_x_pos(), square.cget_y_pos() + 1))
+	{
+		x = square.cget_x_pos();
+		y = square.cget_y_pos() + 1;
+		top = true;
+		find_square(x, y).unhide_square();
+	}
+	//check and unhide the square on the bottom
+	if (is_in_range(square.cget_x_pos(), square.cget_y_pos() - 1) && !square.is_no_recon())
+	{
+		x = square.cget_x_pos();
+		y = square.cget_y_pos() - 1;
+		bottom = true;
+		find_square(x, y).unhide_square();
+	}
+	//check and unhide the square on the top left
+	if (left == true && top == true && !square.is_no_recon())
+	{
+		x = square.cget_x_pos() - 1;
+		y = square.cget_y_pos() + 1;
+		find_square(x, y).unhide_square();
+	}
+	//check and unhide the square on the bottom left
+	if (left == true && bottom == true && !square.is_no_recon())
+	{
+		x = square.cget_x_pos() - 1;
+		y = square.cget_y_pos() - 1;
+		find_square(x, y).unhide_square();
+	}
+	//check and unhide the square on the top right
+	if (right == true && top == true && !square.is_no_recon())
+	{
+		x = square.cget_x_pos() + 1;
+		y = square.cget_y_pos() + 1;
+		find_square(x, y).unhide_square();
+	}
+	//check and unhide the square on the bottom right
+	if (right == true && bottom == true && !square.is_no_recon())
+	{
+		x = square.cget_x_pos() + 1;
+		y = square.cget_y_pos() - 1;
+		find_square(x, y).unhide_square();
+	}
+}
+//hide reconned squares
+void Board::recon_hide(Square& square)
+{
+	int x = 0, y = 0;
+	bool left = false, right = false, top = false, bottom = false;
+	//unlock unit square
+	square.hide_square();
+	//check and hide the square on the left
+	if (is_in_range(square.cget_x_pos() - 1, square.cget_y_pos()))
+	{
+		x = square.cget_x_pos() - 1;
+		y = square.cget_y_pos();
+		left = true;
+		find_square(x, y).hide_square();
+	}
+	//check and hide the square on the right
+	if (is_in_range(square.cget_x_pos() + 1, square.cget_y_pos()))
+	{
+		x = square.cget_x_pos() + 1;
+		y = square.cget_y_pos();
+		right = true;
+		find_square(x, y).hide_square();
+	}
+	//check and hide the square on the top
+	if (is_in_range(square.cget_x_pos(), square.cget_y_pos() + 1))
+	{
+		x = square.cget_x_pos();
+		y = square.cget_y_pos() + 1;
+		top = true;
+		find_square(x, y).hide_square();
+	}
+	//check and hide the square on the bottom
+	if (is_in_range(square.cget_x_pos(), square.cget_y_pos() - 1))
+	{
+		x = square.cget_x_pos();
+		y = square.cget_y_pos() - 1;
+		bottom = true;
+		find_square(x, y).hide_square();
+	}
+	//check and hide the square on the top left
+	if (left == true && top == true)
+	{
+		x = square.cget_x_pos() - 1;
+		y = square.cget_y_pos() + 1;
+		find_square(x, y).hide_square();
+	}
+	//check and hide the square on the bottom left
+	if (left == true && bottom == true)
+	{
+		x = square.cget_x_pos() - 1;
+		y = square.cget_y_pos() - 1;
+		find_square(x, y).hide_square();
+	}
+	//check and hide the square on the top right
+	if (right == true && top == true)
+	{
+		x = square.cget_x_pos() + 1;
+		y = square.cget_y_pos() + 1;
+		find_square(x, y).hide_square();
+	}
+	//check and hide the square on the bottom right
+	if (right == true && bottom == true)
+	{
+		x = square.cget_x_pos() + 1;
+		y = square.cget_y_pos() - 1;
+		find_square(x, y).hide_square();
 	}
 }
 //check range

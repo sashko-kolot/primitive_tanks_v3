@@ -1,3 +1,5 @@
+#include <random>
+#include <ctime>
 #include "gameplay.h"
 void place_mines_and_units(Player& player1, Player& player2)
 {
@@ -76,7 +78,9 @@ void place_loot(Board& player_board)
 		int sq = 0;
 		do
 		{
-			sq = rand() % player_board.get_board().size();
+			std::mt19937 rng(static_cast<unsigned int>(std::time(nullptr)));
+			std::uniform_int_distribution<int> distribution(0, player_board.get_board().size() - 1);
+			sq = distribution(rng);
 		} while (player_board.get_board()[sq].cget_square().is_unit() || player_board.cget_board()[sq].cget_square().is_mine() || player_board.cget_board()[sq].cget_square().is_loot());
 		if (i == 1)
 		{
@@ -119,6 +123,7 @@ void action(Player& player1, Player& player2)
 		opponent = &player1.get_player();
 	}
 	std::cout << "Commander " << me->cget_player_name() << ", it's your turn." << std::endl;
+	proceed();
 	report(me, opponent);
 	std::cout << "\nPlayer board" << std::endl;
 	me->cget_player_board().display_board();
@@ -137,6 +142,7 @@ void action(Player& player1, Player& player2)
 			proceed();
 			break;
 		}
+		//proceed();
 		char action = ' ';
 		std::cout << "Press 'm' to move, 's' to shoot, or 'a' to call air support: ";
 		std::cin >> action;
@@ -369,7 +375,7 @@ bool move_rgt(Player* player1, Player* player2, Unit* unit, int xdif)
 bool move_fwd_rgt(Player* player1, Player* player2, Unit* unit, int xdif, int ydif)
 {
 	Square& prev_square = player1->get_player_board().find_square(unit->cget_x_pos(), unit->cget_y_pos());
-	int x, y;
+	int x, y, y_offset = 0;
 	for (int i = 1; i <= ydif; ++i)
 	{
 		x = unit->cget_x_pos();
@@ -410,11 +416,12 @@ bool move_fwd_rgt(Player* player1, Player* player2, Unit* unit, int xdif, int yd
 			move_update(player1, player2, unit, prev_square, x, y);
 			return true;
 		}
+		y_offset = i;
 	}
 	for (int i = 1; i <= xdif; ++i)
 	{
 		x = unit->cget_x_pos() + i;
-		y = unit->cget_y_pos() + i;
+		y = unit->cget_y_pos() + y_offset;
 		if (!is_passable(player1, x, y))
 			return false;
 	}
@@ -442,7 +449,7 @@ bool move_fwd_rgt(Player* player1, Player* player2, Unit* unit, int xdif, int yd
 bool move_fwd_lft(Player* player1, Player* player2, Unit* unit, int xdif, int ydif)
 {
 	Square& prev_square = player1->get_player_board().find_square(unit->cget_x_pos(), unit->cget_y_pos());
-	int x, y;
+	int x, y, y_offset = 0;
 	for (int i = 1; i <= ydif; ++i)
 	{
 		x = unit->cget_x_pos();
@@ -483,11 +490,12 @@ bool move_fwd_lft(Player* player1, Player* player2, Unit* unit, int xdif, int yd
 			move_update(player1, player2, unit, prev_square, x, y);
 			return true;
 		}
+		y_offset = i;
 	}
 	for (int i = 1; i <= abs(xdif); ++i)
 	{
 		x = unit->cget_x_pos() - i;
-		y = unit->cget_y_pos() + i;
+		y = unit->cget_y_pos() + y_offset;
 		if (!is_passable(player1, x, y))
 			return false;
 	}
@@ -504,7 +512,6 @@ bool move_fwd_lft(Player* player1, Player* player2, Unit* unit, int xdif, int yd
 	for (int i = 1; i <= abs(xdif); ++i)
 	{
 		x = unit->cget_x_pos() - i;
-		y = unit->cget_y_pos();
 		if (mine_on_path(player1, player2, x, y, unit))
 			return true;
 		else
@@ -516,7 +523,7 @@ bool move_fwd_lft(Player* player1, Player* player2, Unit* unit, int xdif, int yd
 bool move_bwd_rgt(Player* player1, Player* player2, Unit* unit, int xdif, int ydif)
 {
 	Square& prev_square = player1->get_player_board().find_square(unit->cget_x_pos(), unit->cget_y_pos());
-	int x, y;
+	int x, y, y_offset = 0;
 	for (int i = 1; i <= abs(ydif); ++i)
 	{
 		x = unit->cget_x_pos();
@@ -557,11 +564,12 @@ bool move_bwd_rgt(Player* player1, Player* player2, Unit* unit, int xdif, int yd
 			move_update(player1, player2, unit, prev_square, x, y);
 			return true;
 		}
+		y_offset = i;
 	}
 	for (int i = 1; i <= xdif; ++i)
 	{
 		x = unit->cget_x_pos() + i;
-		y = unit->cget_y_pos() - i;
+		y = unit->cget_y_pos() - y_offset;
 		if (!is_passable(player1, x, y))
 			return false;
 	}
@@ -589,7 +597,7 @@ bool move_bwd_rgt(Player* player1, Player* player2, Unit* unit, int xdif, int yd
 bool move_bwd_lft(Player* player1, Player* player2, Unit* unit, int xdif, int ydif)
 {
 	Square& prev_square = player1->get_player_board().find_square(unit->cget_x_pos(), unit->cget_y_pos());
-	int x, y;
+	int x, y, y_offset = 0;
 	for (int i = 1; i <= abs(ydif); ++i)
 	{
 		x = unit->cget_x_pos();
@@ -631,11 +639,12 @@ bool move_bwd_lft(Player* player1, Player* player2, Unit* unit, int xdif, int yd
 			move_update(player1, player2, unit, prev_square, x, y);
 			return true;
 		}
+		y_offset = i;
 	}
 	for (int i = 1; i <= abs(xdif); ++i)
 	{
 		x = unit->cget_x_pos() - i;
-		y = unit->cget_y_pos() - i;
+		y = unit->cget_y_pos() - y_offset;
 		if (!is_passable(player1, x, y))
 			return false;
 	}
@@ -665,8 +674,6 @@ bool is_passable(Player* player1, int x, int y)
 	if (player1->get_player_board().find_square(x, y).is_locked() || player1->get_player_board().find_square(x, y).is_hit()
 		|| player1->get_player_board().find_square(x, y).is_kill())
 	{
-		std::cout << "The square is inaccessible, commander." << std::endl;
-		proceed();
 		return false;
 	}
 	else
@@ -680,12 +687,10 @@ bool mine_on_path(Player* player1, Player* player2, int x, int y, Unit* unit)
 	{
 		player1->get_player_board().find_square(x, y).set_kill();
 		player1->get_player_board().find_square(unit->cget_x_pos(), unit->cget_y_pos()).remove_unit();
+		player2->get_enemy_board().find_square(unit->cget_x_pos(), unit->cget_y_pos()).remove_unit();
 		if (unit->is_recon_kit())
 		{
-			for (auto& ptr : unit->get_reconned_squares())
-			{
-				ptr->hide_square();
-			}
+			player1->get_enemy_board().recon_hide(player1->get_enemy_board().find_square(unit->cget_x_pos(), unit->cget_y_pos()));
 		}
 		if (unit->is_mask_kit())
 		{
@@ -769,17 +774,14 @@ void move_update(Player* player1, Player* player2, Unit* unit, Square& prev_squa
 {
 	if (unit->is_recon_kit())
 	{
-		for (auto& ptr : unit->get_reconned_squares())
-		{
-			ptr->hide_square();
-		}
-		unit->get_reconned_squares().clear();
+		player1->get_enemy_board().recon_hide(player1->get_enemy_board().find_square(prev_square.cget_x_pos(), prev_square.cget_y_pos()));
 	}
 	if (unit->is_mask_kit())
 	{
 		player2->get_enemy_board().find_square(prev_square.cget_x_pos(), prev_square.cget_y_pos()).remove_no_recon();
 	}
 	prev_square.remove_unit();
+	player2->get_enemy_board().find_square(prev_square.cget_x_pos(), prev_square.cget_y_pos()).remove_unit();
 	prev_square.hide_square();
 	player1->get_player_board().unlocker(prev_square);
 	unit->get_x_pos() = x;
@@ -793,11 +795,12 @@ void move_update(Player* player1, Player* player2, Unit* unit, Square& prev_squa
 	player2->get_enemy_board().find_square(x, y).set_unit();
 	if (unit->is_recon_kit())
 	{
-		reconnoiter(player1, unit);
+		player1->get_enemy_board().recon_unhide(player1->get_enemy_board().find_square(unit->cget_x_pos(), unit->cget_y_pos()));
 	}
 	if (unit->is_mask_kit())
 	{
 		player2->get_enemy_board().find_square(unit->cget_x_pos(), unit->cget_y_pos()).set_no_recon();
+		player2->get_enemy_board().find_square(unit->cget_x_pos(), unit->cget_y_pos()).hide_square();
 	}
 	std::cout << "Your unit reached the destination, commander." << std::endl;
 	proceed();
@@ -982,49 +985,20 @@ bool call_air_support(Player* player1, Player* player2, Unit* unit)
 	proceed();
 	return true;
 }
-void reconnoiter(Player* player1, Unit* unit)
-{
-	unit->get_reconned_squares().push_back(std::make_shared<Square>(player1->get_enemy_board().find_square(unit->cget_x_pos(), unit->cget_y_pos())));
-	if(player1->get_enemy_board().is_in_range(unit->cget_x_pos() - 1, unit->cget_y_pos()))
-	unit->get_reconned_squares().push_back(std::make_shared<Square>(player1->get_enemy_board().find_square(unit->cget_x_pos() - 1, unit->cget_y_pos())));
-	if (player1->get_enemy_board().is_in_range(unit->cget_x_pos() + 1, unit->cget_y_pos()))
-	unit->get_reconned_squares().push_back(std::make_shared<Square>(player1->get_enemy_board().find_square(unit->cget_x_pos() + 1, unit->cget_y_pos())));
-	if (player1->get_enemy_board().is_in_range(unit->cget_x_pos(), unit->cget_y_pos() - 1))
-	unit->get_reconned_squares().push_back(std::make_shared<Square>(player1->get_enemy_board().find_square(unit->cget_x_pos(), unit->cget_y_pos() - 1)));
-	if (player1->get_enemy_board().is_in_range(unit->cget_x_pos(), unit->cget_y_pos() + 1))
-	unit->get_reconned_squares().push_back(std::make_shared<Square>(player1->get_enemy_board().find_square(unit->cget_x_pos(), unit->cget_y_pos() + 1)));
-	if (player1->get_enemy_board().is_in_range(unit->cget_x_pos() - 1, unit->cget_y_pos() + 1))
-	unit->get_reconned_squares().push_back(std::make_shared<Square>(player1->get_enemy_board().find_square(unit->cget_x_pos() - 1, unit->cget_y_pos() + 1)));
-	if (player1->get_enemy_board().is_in_range(unit->cget_x_pos() - 1, unit->cget_y_pos() - 1))
-	unit->get_reconned_squares().push_back(std::make_shared<Square>(player1->get_enemy_board().find_square(unit->cget_x_pos() - 1, unit->cget_y_pos() - 1)));
-	if (player1->get_enemy_board().is_in_range(unit->cget_x_pos() + 1, unit->cget_y_pos() - 1))
-	unit->get_reconned_squares().push_back(std::make_shared<Square>(player1->get_enemy_board().find_square(unit->cget_x_pos() + 1, unit->cget_y_pos() - 1)));
-	if (player1->get_enemy_board().is_in_range(unit->cget_x_pos() + 1, unit->cget_y_pos() + 1))
-	unit->get_reconned_squares().push_back(std::make_shared<Square>(player1->get_enemy_board().find_square(unit->cget_x_pos() + 1, unit->cget_y_pos() + 1)));
-	for(auto& ptr : unit->get_reconned_squares())
-	{
-		if (!ptr->is_no_recon())
-		{
-			ptr->unhide_square();
-		}
-	}
-}
 void remove_killed_unit(Player* player1, Player* player2, int x, int y)
 {
-	player1->get_enemy_board().find_square(x, y).remove_unit();
-	player1->get_enemy_board().find_square(x, y).set_kill();
-	player2->get_player_board().unlocker(player2->get_player_board().find_square(x, y));
-	for (int i = 0; i < player2->cget_my_units().size(); ++i)
+	 
+	player1.get_enemy_board().find_square(x, y).remove_unit();
+	player1.get_enemy_board().find_square(x, y).set_kill();
+	player2.get_player_board().unlocker(player2.get_player_board().find_square(x, y));
+	for (int i = 0; i < player2.cget_my_units().size(); ++i)
 	{
 		Unit* unit = &player2->get_my_units()[i];
 		if (unit->cget_x_pos() == x && unit->cget_y_pos() == y)
 		{
 			if (unit->is_recon_kit())
 			{
-					for (auto& ptr : unit->get_reconned_squares())
-					{
-						ptr->hide_square();
-					}
+				player2->get_enemy_board().recon_hide(player2->get_enemy_board().find_square(unit->cget_x_pos(), unit->cget_y_pos()));
 			}
 			if (unit->is_mask_kit())
 			{
@@ -1046,15 +1020,16 @@ void report(Player* player1, Player* player2)
 			<< "\nUpgrades:";
 		if (player1->cget_my_units()[i].is_repair_kit())
 			std::cout << " repair kit |";
-		else if (player1->cget_my_units()[i].is_air_support())
+		if (player1->cget_my_units()[i].is_air_support())
 			std::cout << " air support |";
-		else if (player1->cget_my_units()[i].is_mask_kit())
+		if (player1->cget_my_units()[i].is_mask_kit())
 			std::cout << " mask kit |";
-		else if (player1->cget_my_units()[i].is_mine_clearing())
+		if (player1->cget_my_units()[i].is_mine_clearing())
 			std::cout << " mine clearing kit |";
-		else if (player1->cget_my_units()[i].is_recon_kit())
+		if (player1->cget_my_units()[i].is_recon_kit())
 			std::cout << " reconnaissance kit |";
-		else
+		if(!player1->cget_my_units()[i].is_repair_kit() && !player1->cget_my_units()[i].is_air_support() && !player1->cget_my_units()[i].is_mask_kit()
+			&& !player1->cget_my_units()[i].is_mine_clearing() && !player1->cget_my_units()[i].is_recon_kit())
 			std::cout << "n/a";
 	}
 	std::cout << "\nEnemy units destroyed: " << player2->cget_number_of_units() - player2->cget_my_units().size() << "\n";
@@ -1099,4 +1074,43 @@ void proceed()
 		std::cout << "Press 'y' to continue.\n";
 		std::cin >> choice;
 	} while (choice != 'y');
+}
+void intro_text()
+{
+	std::cout << "Primitive Tanks\n" <<
+		"This is a two - player turn - based board game played on one computer.\n" <<
+		"\nGame Setup\n" <<
+		"Each player has two boards 15X12 squares.The Player Board is used to move the player's units and collect loot items.\n"
+		<< "The Enemy Board is used to plant mines, shoot, and reconnoiter.\n"
+		<< "At the beginning of the game, players plant mines on their Enemy Boards and place their units on their Player Boards.\n" <<
+		"When a unit is placed, it locks squares around itself, which means that other units cannotbe placed there or move through those squares.\n"
+		<< "This ensures some maneuvering space for units.So, when you place two units near each other, the distance between them must be at least two squares.\n"
+		<< "You plant mines and place units by entering their coordinates.After each action, the result will be displayed on the screen.\n"
+		<< "Each player plants five mines and places ten units.\n"
+		<< "Once both players have finished planting mines and placing units, the program randomly distributes loot items on Player Boards.\n"
+		<< "Then the combat begines.\n"
+		<< "\nGame Process\n"
+		<< "Each turn consists of the following stages: selecting unit, selecting an action to be performed by the selected unit, and displaying the result.\n"
+		<< "Only one action can be performed on one turn.You can move your unit, shoot with your unit, or make an air assault.\n"
+		<< "For the latter, the selected unit needs to have a special loot item.\n"
+		<< "You can move your units forward, backward, left, right, or you can move in any of the mentioned directions with one turn, like knight in chess.\n"
+		<< "But the length of your move must not exceed three squares.\n"
+		<< "You cannot move through squares locked by other units(marked as lock), hit by you opponent's shots(hit), or occupied by destroyed units (kill).\n"
+		<< "While moving, you may collect loot items or get destroyed by a mine.\n"
+		<< "Use your Enemy Board for shooting.The result will be displayed both on your Enemy Board and your opponent's Player Board.\n"
+		<< "If you have a unit with the air support item, you can select a square on your Enemy Board as a central target point.\n"
+		<< "The air support will hit that square and all adjacent squares, killing all enemy units in that area.\n"
+		<< "You cannot select squares on board edges as the central target for the air assault.\n"
+		<< "\nLoot Items\n"
+		<< "Reapir Kit and Mine Clearing Kit help your unit to cope with mines.Once your unit encounters a mine, it will survive, losing the item.\n"
+		<< "Air Support enables your unit to call air support.Unfortunately, you can do it only once during a game.\n"
+		<< "If your unit has Reconnaissance Kit, you will see on your Enemy Board if there are enemy units in the area relevant\n"
+		<< "to you unit's current position and its locked squares. Of course, provided that the enemy unit does not have Mask Kit.\n"
+		<< "If a unit with Mask Kit enters and then leaves the reconnoitered area, the square will remain invisible until being reconnoitered again.\n"
+		<< "Reconnaissance Kit and Mask Kit remain with their owners while they live.\n"
+		<< "You can also find Extra Ammo, adding + 5 to your unit's ammo.\n"
+		<< "\nGame End\n"
+		<< "Who loses their units or is out of ammo first, loses the game.\n"
+		<< "An now just enjoy playing." << std::endl;
+	proceed();
 }
