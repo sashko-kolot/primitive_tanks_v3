@@ -201,6 +201,7 @@ bool move(Player* player1, Player* player2, Unit* unit)
 	player1->get_player_board().unlocker(player1->get_player_board().find_square(unit->cget_x_pos(), unit->cget_y_pos()));
 	if (!player1->get_player_board().is_accessible(target_square->get_square()))
 	{
+		player1->get_player_board().locker(player1->get_player_board().find_square(unit->cget_x_pos(), unit->cget_y_pos()));
 		return false;
 	}
 	//move fwd
@@ -209,6 +210,7 @@ bool move(Player* player1, Player* player2, Unit* unit)
 		if (move_fwd(player1, player2, unit, ydif))
 			return true;
 		else
+			player1->get_player_board().locker(player1->get_player_board().find_square(unit->cget_x_pos(), unit->cget_y_pos()));
 			return false;
 	}
 	//move bwd
@@ -217,6 +219,7 @@ bool move(Player* player1, Player* player2, Unit* unit)
 		if (move_bwd(player1, player2, unit, ydif))
 			return true;
 		else
+			player1->get_player_board().locker(player1->get_player_board().find_square(unit->cget_x_pos(), unit->cget_y_pos()));
 			return false;
 	}
 	//move left
@@ -225,6 +228,7 @@ bool move(Player* player1, Player* player2, Unit* unit)
 		if (move_lft(player1, player2, unit, xdif))
 			return true;
 		else
+			player1->get_player_board().locker(player1->get_player_board().find_square(unit->cget_x_pos(), unit->cget_y_pos()));
 			return false;
 	}
 	//move right
@@ -243,6 +247,7 @@ bool move(Player* player1, Player* player2, Unit* unit)
 			if (move_fwd_rgt(player1, player2, unit, xdif, ydif))
 				return true;
 			else
+				player1->get_player_board().locker(player1->get_player_board().find_square(unit->cget_x_pos(), unit->cget_y_pos()));
 				return false;
 		}
 	}
@@ -252,6 +257,7 @@ bool move(Player* player1, Player* player2, Unit* unit)
 		if (move_fwd_lft(player1, player2, unit, xdif, ydif))
 			return true;
 		else
+			player1->get_player_board().locker(player1->get_player_board().find_square(unit->cget_x_pos(), unit->cget_y_pos()));
 			return false;
 	}
 	//move bwd & right or right & bwd
@@ -260,6 +266,7 @@ bool move(Player* player1, Player* player2, Unit* unit)
 		if (move_bwd_rgt(player1, player2, unit, xdif, ydif))
 			return true;
 		else
+			player1->get_player_board().locker(player1->get_player_board().find_square(unit->cget_x_pos(), unit->cget_y_pos()));
 			return false;
 	}
 	//move bwd & left or left & bwd
@@ -269,6 +276,7 @@ bool move(Player* player1, Player* player2, Unit* unit)
 		
 			return true;
 		else
+			player1->get_player_board().locker(player1->get_player_board().find_square(unit->cget_x_pos(), unit->cget_y_pos()));
 			return false;
 	}
 	player1->get_player_board().unlocker(player1->get_player_board().find_square(unit->cget_x_pos(), unit->cget_y_pos()));
@@ -380,7 +388,7 @@ bool move_fwd_rgt(Player* player1, Player* player2, Unit* unit, int xdif, int yd
 	{
 		x = unit->cget_x_pos();
 		y = unit->cget_y_pos() + i;
-		if (!is_passable(player1, x, y))
+		if (!is_passable(player1, x, y) || (is_passable(player1, x, y) && !is_passable(player1, x + 1, y) && ydif == 1))
 		{
 			for (int i = 1; i <= xdif; ++i)
 			{
@@ -454,7 +462,7 @@ bool move_fwd_lft(Player* player1, Player* player2, Unit* unit, int xdif, int yd
 	{
 		x = unit->cget_x_pos();
 		y = unit->cget_y_pos() + i;
-		if (!is_passable(player1, x, y))
+		if (!is_passable(player1, x, y) || (is_passable(player1, x, y) && !is_passable(player1, x - 1, y) && ydif == 1))
 		{
 			for (int i = 1; i <= abs(xdif); ++i)
 			{
@@ -528,7 +536,7 @@ bool move_bwd_rgt(Player* player1, Player* player2, Unit* unit, int xdif, int yd
 	{
 		x = unit->cget_x_pos();
 		y = unit->cget_y_pos() - i;
-		if (!is_passable(player1, x, y))
+		if (!is_passable(player1, x, y) || (is_passable(player1, x, y) && !is_passable(player1, x + 1, y) && ydif == - 1))
 		{
 			for (int i = 1; i <= xdif; ++i)
 			{
@@ -602,7 +610,7 @@ bool move_bwd_lft(Player* player1, Player* player2, Unit* unit, int xdif, int yd
 	{
 		x = unit->cget_x_pos();
 		y = unit->cget_y_pos() - i;
-		if (!is_passable(player1, x, y))
+		if (!is_passable(player1, x, y) || (is_passable(player1, x, y) && !is_passable(player1, x - 1, y) && ydif == - 1))
 		{
 			for (int i = 1; i <= abs(xdif); ++i)
 			{
@@ -786,7 +794,7 @@ void move_update(Player* player1, Player* player2, Unit* unit, Square& prev_squa
 	player1->get_player_board().unlocker(prev_square);
 	unit->get_x_pos() = x;
 	unit->get_y_pos() = y;
-	unit->get_square().set_unit();
+	//unit->get_square().set_unit();
 	player1->get_player_board().find_square(x, y).set_unit();
 	player1->get_player_board().find_square(x, y).unhide_square();
 	player1->get_player_board().find_square(x, y).assign_unit_id(unit->cget_unit_id());
@@ -795,12 +803,12 @@ void move_update(Player* player1, Player* player2, Unit* unit, Square& prev_squa
 	player2->get_enemy_board().find_square(x, y).set_unit();
 	if (unit->is_recon_kit())
 	{
-		player1->get_enemy_board().recon_unhide(player1->get_enemy_board().find_square(unit->cget_x_pos(), unit->cget_y_pos()));
+		player1->get_enemy_board().recon_unhide(player1->get_enemy_board().find_square(x, y));
 	}
 	if (unit->is_mask_kit())
 	{
-		player2->get_enemy_board().find_square(unit->cget_x_pos(), unit->cget_y_pos()).set_no_recon();
-		player2->get_enemy_board().find_square(unit->cget_x_pos(), unit->cget_y_pos()).hide_square();
+		player2->get_enemy_board().find_square(x,y).set_no_recon();
+		player2->get_enemy_board().find_square(x, y).hide_square();
 	}
 	std::cout << "Your unit reached the destination, commander." << std::endl;
 	proceed();
