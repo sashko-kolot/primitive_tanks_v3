@@ -2,6 +2,8 @@
 
 int main()
 {
+	intro_text();
+	system("cls");
 	Player player1;
 	Player player2;
 	std::cout << "Player 1, you are welcome." << std::endl;

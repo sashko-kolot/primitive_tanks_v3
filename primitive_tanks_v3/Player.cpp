@@ -27,12 +27,24 @@ Player& Player::get_player()
 Unit& Player::find_unit_by_id()
 {
 	Unit* unit = nullptr;
-	int id = 0;
 	bool is_unit = false;
+	int id = 0;
 	do
 	{ 
-	std::cout << "Select a unit by entering its id: ";
-	std::cin >> id;
+		while(true)
+		{ 
+		std::cout << "Select a unit by entering its id: ";
+		if (std::cin >> id)
+		{
+			break;
+		}
+		else 
+		{
+			std::cout << "Invalid input." << std::endl;
+			std::cin.clear();
+			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+		}
+	}
 	for (int i = 0; i < my_units.size(); ++i)
 	{
 		if (id == my_units[i].cget_unit_id())

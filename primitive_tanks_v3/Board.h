@@ -1,8 +1,10 @@
 #ifndef BOARD_H
 #define BOARD_H
 #include <vector>
+#include<memory>
 #include <iostream>
 #include <iomanip>
+#include <limits>
 #include <cstdlib>
 #include "Square.h"
 class Board
@@ -22,6 +24,8 @@ public:
 	bool is_in_range(int, int) const;
 	void locker(Square&);
 	void unlocker(Square&);
+	void recon_unhide(Square&);
+	void recon_hide(Square&);
 	void proceed();
 };
 #endif BOARD_H
