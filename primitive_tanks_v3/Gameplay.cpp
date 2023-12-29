@@ -1044,29 +1044,41 @@ void report(Player* player1, Player* player2)
 }
 bool game_over(const Player& player1, const Player& player2)
 {
-	if (player1.cget_total_ammo() == 0 && player2.cget_my_units().size() == 0)
+	if (player1.cget_total_ammo() == 0 || player2.cget_total_ammo() == 0)
 	{
-		std::cout << "Game over! Commander " << player1.cget_player_name() << " wins!" << std::endl;
-		proceed();
-		return true;
+		if (player1.cget_my_units().size() > player2.cget_my_units().size())
+		{
+			std::cout << "Game over! Commander " << player1.cget_player_name() << " wins!" << std::endl;
+			proceed();
+			return true;
+		}
+		if (player1.cget_my_units().size() < player2.cget_my_units().size())
+		{
+			std::cout << "Game over! Commander " << player2.cget_player_name() << " wins!" << std::endl;
+			proceed();
+			return true;
+		}
+		if (player1.cget_my_units().size() == player2.cget_my_units().size())
+		{
+			std::cout << "Game over! You both fought well, commanders, but neither of you was strong enough to win this battle." << std::endl;
+			proceed();
+			return true;
+		}
 	}
-	else if (player2.cget_total_ammo() == 0 && player1.cget_my_units().size() == 0)
+	else if (player1.cget_my_units().size() == 0 || player2.cget_my_units().size() == 0)
 	{
-		std::cout << "Game over! Commander " << player2.cget_player_name() << " wins!" << std::endl;
-		proceed();
-		return true;
-	}
-	else if (player1.cget_my_units().size() == 0 || player1.cget_total_ammo() == 0)
-	{
-		std::cout << "Game over! Commander " << player2.cget_player_name() << " wins!" << std::endl;
-		proceed();
-		return true;
-	}
-	else if (player2.cget_my_units().size() == 0 || player2.cget_total_ammo() == 0)
-	{
-		std::cout << "Game over! Commander " << player1.cget_player_name() << " wins!" << std::endl;
-		proceed();
-		return true;
+		if (player1.cget_my_units().size() > player2.cget_my_units().size())
+		{
+			std::cout << "Game over! Commander " << player1.cget_player_name() << " wins!" << std::endl;
+			proceed();
+			return true;
+		}
+		else
+		{
+			std::cout << "Game over! Commander " << player2.cget_player_name() << " wins!" << std::endl;
+			proceed();
+			return true;
+		}
 	}
 	else
 	{
@@ -1117,7 +1129,8 @@ void intro_text()
 		<< "Reconnaissance Kit and Mask Kit remain with their owners while they live.\n"
 		<< "You can also find Extra Ammo, adding + 5 to your unit's ammo.\n"
 		<< "\nGame End\n"
-		<< "Who loses their units or is out of ammo first, loses the game.\n"
+		<< "The game ends when either of the players loses all their units or is out of ammo.\n"
+		<< "When either of the players is out of ammo, the one with more units wins. If both players have an equal number of units, the game ends in a tie.\n"
 		<< "An now just enjoy playing." << std::endl;
 	proceed();
 }

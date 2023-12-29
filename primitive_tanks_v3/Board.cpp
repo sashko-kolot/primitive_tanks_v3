@@ -38,13 +38,12 @@ const std::vector<Square>& Board::cget_board() const
 //find square
 Square& Board::find_square(int x, int y) 
 {
-	Square* square = nullptr;
 	for (int i = 0; i < board_size; ++i)
 	{
-		if (cget_board()[i].cget_square().cget_x_pos() == x && cget_board()[i].cget_square().cget_y_pos() == y)
-			square = &get_board()[i].get_square();
+			if (cget_board()[i].cget_square().cget_x_pos() == x && cget_board()[i].cget_square().cget_y_pos() == y)
+				return get_board()[i].get_square();
 	}
-	return square->get_square();
+	return get_board()[0].get_square();
 }
 //build board
 void Board::build_board()
