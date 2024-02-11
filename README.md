@@ -1,4 +1,3 @@
-Game description
 A turn-based console tactical board game for two players which is played on one computer. 
 The game imitates a tank battle. Players have an equal number of units they place on the board with X and Y coordinates at the beginning of the game. 
 By moving units and shooting on their turn, players try to destroy all units of the opponent and to avoid destruction of their own units.
